@@ -1,33 +1,64 @@
-// Uncomment the code below and write your tests
-// import { getBankAccount } from '.';
+import { getBankAccount, InsufficientFundsError, TransferFailedError } from '.';
 
 describe('BankAccount', () => {
+  const testBalance = 78;
+  const testAccount = getBankAccount(testBalance);
+  const testAnotherAccount = getBankAccount(80);
+
   test('should create account with initial balance', () => {
-    // Write your test here
+    expect(testAccount.getBalance()).toBe(testBalance);
   });
 
   test('should throw InsufficientFundsError error when withdrawing more than balance', () => {
-    // Write your test here
+    expect(() => testAccount.withdraw(100)).toThrow(InsufficientFundsError);
+    expect(() => testAccount.withdraw(100)).toThrow(
+      `Insufficient funds: cannot withdraw more than ${testBalance}`,
+    );
   });
 
   test('should throw error when transferring more than balance', () => {
-    // Write your test here
+    expect(() => testAccount.transfer(100, testAnotherAccount)).toThrow(
+      InsufficientFundsError,
+    );
+    expect(() => testAccount.transfer(100, testAnotherAccount)).toThrow(
+      `Insufficient funds: cannot withdraw more than ${testBalance}`,
+    );
   });
 
   test('should throw error when transferring to the same account', () => {
-    // Write your test here
+    expect(() => testAccount.transfer(50, testAccount)).toThrow(
+      TransferFailedError,
+    );
+    expect(() => testAccount.transfer(50, testAccount)).toThrow(
+      'Transfer failed',
+    );
   });
 
   test('should deposit money', () => {
-    // Write your test here
+    const testDeposit = 100;
+    const oldBalance = testAccount.getBalance();
+    testAccount.deposit(testDeposit);
+    expect(testAccount.getBalance()).toBe(oldBalance + testDeposit);
   });
 
   test('should withdraw money', () => {
-    // Write your test here
+    const testWithdraw = 50;
+    const oldBalance = testAccount.getBalance();
+    testAccount.withdraw(testWithdraw);
+    expect(testAccount.getBalance()).toBe(oldBalance - testWithdraw);
   });
 
   test('should transfer money', () => {
-    // Write your test here
+    const oldBalanceAccountFrom = testAccount.getBalance();
+    const oldBalanceAccountTo = testAnotherAccount.getBalance();
+    const transferAmount = 10;
+    testAccount.transfer(transferAmount, testAnotherAccount);
+    expect(testAccount.getBalance()).toBe(
+      oldBalanceAccountFrom - transferAmount,
+    );
+    expect(testAnotherAccount.getBalance()).toBe(
+      oldBalanceAccountTo + transferAmount,
+    );
   });
 
   test('fetchBalance should return number in case if request did not failed', async () => {
